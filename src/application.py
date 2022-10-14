@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from cbs_resource import CBSresource
 from flask_cors import CORS
+from utils import DTEncoder
 
 # Create the Flask application object.
 app = Flask(__name__,
@@ -48,6 +49,35 @@ def register():
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     else:
         rsp = Response("Methods not defined", status=404, content_type="text/plain")
+    return rsp
+
+@app.route("/api/session", methods=["GET"])
+def get_available_session():
+    result = CBSresource.get_available_session()
+    if result['success']:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=404, content_type="application.json")
+    return rsp
+
+@app.route("/api/session/<sessionid>", methods=["GET"])
+def get_session_by_key(sessionid):
+
+    result = CBSresource.get_session_by_key(sessionid)
+    if result['success']:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=404, content_type="application.json")
+    return rsp
+
+@app.route("/api/session/<sessionid>/enroll/<userid>", methods=["GET"])
+def enroll_session(sessionid, userid):
+
+    result = CBSresource.enroll_session(sessionid, userid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=404, content_type="application.json")
     return rsp
 
 

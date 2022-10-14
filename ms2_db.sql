@@ -1,10 +1,15 @@
 use ms2_db;
 
+-- Drop table
+DROP TABLE IF EXISTS waitlist;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
+
 -- Create table
 DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (
-    userid int auto_increment primary key,
+    userid int auto_increment PRIMARY KEY,
     email varchar(255) unique NOT NULL ,
     `password` varchar(255) NOT NULL ,
     username varchar(255) default 'Badminton Player',
@@ -14,7 +19,6 @@ CREATE TABLE users
     credits	int default 100
 );
 
-DROP TABLE IF EXISTS sessions;
 CREATE TABLE sessions
 (
     sessionid int auto_increment primary key,
@@ -23,14 +27,18 @@ CREATE TABLE sessions
     capacity int default 8
 );
 
-DROP TABLE IF EXISTS waitlist;
 CREATE TABLE waitlist
 (
-    sessionid int references sessions.sessionid,
-    userid int references users.userid,
+    sessionid int,
+    userid int,
     updatetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    primary key (sessionid, userid)
+    notes varchar(255),
+    PRIMARY KEY (sessionid, userid),
+    FOREIGN KEY (sessionid) REFERENCES sessions(sessionid) ON DELETE CASCADE,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE
+
 );
+
 
 -- Insertion
 INSERT INTO users (email, password, username, sex, birthday, credits ) VALUES ('test5@test.com', '123456', 'panda', 'female', '2014-01-01', '90');
@@ -46,9 +54,13 @@ INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-18 18:30:00', '2022-1
 INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-19 18:30:00', '2022-10-19 19:30:00');
 INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-20 18:30:00', '2022-10-20 19:30:00');
 
-INSERT INTO waitlist (sessionid, userid) VALUES (1,1);
-INSERT INTO waitlist (sessionid, userid) VALUES (1,3);
+INSERT INTO waitlist (sessionid, userid, notes) VALUES (1,1, 'Enjoy');
+INSERT INTO waitlist (sessionid, userid, notes) VALUES (1,3, 'Welcome');
 INSERT INTO waitlist (sessionid, userid) VALUES (1,6);
+INSERT INTO waitlist (sessionid, userid) VALUES (2,1);
+INSERT INTO waitlist (sessionid, userid) VALUES (2,2);
+INSERT INTO waitlist (sessionid, userid) VALUES (2,4);
+INSERT INTO waitlist (sessionid, userid) VALUES (2,5);
 
 
 SELECT * FROM users;
