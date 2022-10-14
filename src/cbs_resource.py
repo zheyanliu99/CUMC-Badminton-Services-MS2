@@ -123,6 +123,28 @@ class CBSresource:
             result = {'success':False, 'message':str(e)}
         return result 
 
+    @staticmethod
+    def quit_waitlist(sessionid, userid):
+        sql_p = "SELECT * FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
+        sql = "DELETE FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql_p, args=(sessionid, userid))
+            res = cur.fetchone()
+            if res:
+                cur.execute(sql, args=(sessionid, userid))
+                # if register success
+                result = {'success':True, 'message':'You have quitted the waitlist'}
+            else:
+                result = {'success':False, 'message':'You are not in the waitlist'}
+
+        except pymysql.Error as e:
+            print(e)
+            res = 'ERROR'
+            result = {'success':False, 'message':str(e)}
+        return result 
+
 
         
         

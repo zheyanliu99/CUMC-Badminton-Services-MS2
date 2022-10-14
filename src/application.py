@@ -80,6 +80,16 @@ def enroll_session(sessionid, userid):
         rsp = Response(json.dumps(result), status=404, content_type="application.json")
     return rsp
 
+@app.route("/api/session/<sessionid>/quit/<userid>", methods=["GET"])
+def quit_waitlist(sessionid, userid):
+
+    result = CBSresource.quit_waitlist(sessionid, userid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+    return rsp
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5011, debug=True)
