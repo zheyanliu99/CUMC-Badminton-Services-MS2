@@ -3,4 +3,4 @@ Microservice2 for CUMC Badminton Services, which contains auth and booking sessi
 
 # Notifications
 
-Use ms2_db.sql to init database before running application.py.
+Use [ms2_db.sql](ms2_db.sql) to init database before running application.py.
