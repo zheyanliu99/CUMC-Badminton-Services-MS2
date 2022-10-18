@@ -13,5 +13,5 @@ SELECT distinct s.sessionid
 FROM ms2_db.sessions s
 LEFT JOIN ms2_db.waitlist w
 ON s.sessionid = w.sessionid
-WHERE w.userid != 1) t2
+WHERE w.userid = 1) t2
 ON t1.sessionid = t2.sessionid;

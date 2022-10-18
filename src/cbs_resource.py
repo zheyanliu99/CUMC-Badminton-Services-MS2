@@ -72,7 +72,7 @@ class CBSresource:
     @staticmethod
     def get_available_session(userid):
 
-        sql = """SELECT t1.*, (CASE WHEN t2.sessionid IS NULL THEN FALSE ELSE TRUE END) is_registered
+        sql = """SELECT t1.*, (CASE WHEN t2.sessionid IS NULL THEN 0 ELSE 1 END) is_registered
                  FROM
                  (
                  SELECT s.sessionid, begintime, endtime, s.notes, s.capacity, count(1) enrolled
@@ -87,7 +87,7 @@ class CBSresource:
                  FROM ms2_db.sessions s
                  LEFT JOIN ms2_db.waitlist w
                  ON s.sessionid = w.sessionid
-                 WHERE w.userid != %s) t2
+                 WHERE w.userid = %s) t2
                  ON t1.sessionid = t2.sessionid"""
         conn = CBSresource._get_connection()
         cur = conn.cursor()
