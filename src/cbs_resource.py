@@ -70,13 +70,29 @@ class CBSresource:
         return result
 
     @staticmethod
-    def get_available_session():
+    def get_available_session(userid):
 
-        sql = "SELECT * FROM ms2_db.sessions WHERE endtime > %s"
+        sql = """SELECT t1.*, (CASE WHEN t2.sessionid IS NULL THEN FALSE ELSE TRUE END) is_registered
+                 FROM
+                 (
+                 SELECT s.sessionid, begintime, endtime, s.notes, s.capacity, count(1) enrolled
+                 FROM ms2_db.sessions s
+                 LEFT JOIN ms2_db.waitlist w
+                 ON s.sessionid = w.sessionid
+                 WHERE s.endtime > %s
+                 GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity) t1
+                 LEFT JOIN
+                 (
+                 SELECT distinct s.sessionid
+                 FROM ms2_db.sessions s
+                 LEFT JOIN ms2_db.waitlist w
+                 ON s.sessionid = w.sessionid
+                 WHERE w.userid != %s) t2
+                 ON t1.sessionid = t2.sessionid"""
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         try:
-            cur.execute(sql, args=(datetime.now()))
+            cur.execute(sql, args=(datetime.now(), userid))
             # if register success
             res = cur.fetchall()
             if res:

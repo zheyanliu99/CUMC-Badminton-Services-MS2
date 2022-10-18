@@ -51,13 +51,13 @@ def register():
         rsp = Response("Methods not defined", status=404, content_type="text/plain")
     return rsp
 
-@app.route("/api/session", methods=["GET"])
+@app.route("/api/session", methods=["POST"])
 def get_available_session():
-    result = CBSresource.get_available_session()
+    result = CBSresource.get_available_session(request.data)
     if result['success']:
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     else:
-        rsp = Response(json.dumps(result, cls=DTEncoder), status=404, content_type="application.json")
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     return rsp
 
 @app.route("/api/session/<sessionid>", methods=["GET"])
@@ -67,7 +67,7 @@ def get_session_by_key(sessionid):
     if result['success']:
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     else:
-        rsp = Response(json.dumps(result, cls=DTEncoder), status=404, content_type="application.json")
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     return rsp
 
 @app.route("/api/session/<sessionid>/enroll/<userid>", methods=["GET"])
@@ -77,7 +77,7 @@ def enroll_session(sessionid, userid):
     if result['success']:
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     else:
-        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
     return rsp
 
 @app.route("/api/session/<sessionid>/quit/<userid>", methods=["GET"])
@@ -87,7 +87,7 @@ def quit_waitlist(sessionid, userid):
     if result['success']:
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     else:
-        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
     return rsp
 
 
