@@ -146,10 +146,10 @@ class CBSresource:
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         try:
-            cur.execute(sql_p, args=(sessionid, userid))
+            cur.execute(sql_p, args=(userid, sessionid))
             res = cur.fetchone()
             if res:
-                cur.execute(sql, args=(sessionid, userid))
+                cur.execute(sql, args=(userid, sessionid))
                 # if register success
                 result = {'success':True, 'message':'You have quitted the waitlist'}
             else:
