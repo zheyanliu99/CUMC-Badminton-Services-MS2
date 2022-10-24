@@ -140,6 +140,34 @@ class CBSresource:
         return result 
 
     @staticmethod
+    def get_session_by_user(userid):
+        sql = """
+        SELECT s.sessionid, begintime, endtime, s.notes, s.capacity, count(1) enrolled
+        FROM (SELECT * FROM ms2_db.sessions
+              WHERE endtime > %s
+              AND sessionid in (SELECT sessionid FROM ms2_db.waitlist WHERE userid = %s) )s
+        LEFT JOIN ms2_db.waitlist w
+        ON s.sessionid = w.sessionid
+        GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity;
+        """
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args=(datetime.now(), userid))
+            res = cur.fetchall()
+            # if fetched successful
+            if res:
+                result = {'success':True, 'message':'Here is your sessions in the waitlist', 'data':res}
+            else:
+                result = {'success':False, 'message':'You have no sessions in the waitlist', 'data':res}
+
+        except pymysql.Error as e:
+            print(e)
+            res = 'ERROR'
+            result = {'success':False, 'message':str(e)}
+        return result 
+
+    @staticmethod
     def quit_waitlist(sessionid, userid):
         sql_p = "SELECT * FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
         sql = "DELETE FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"

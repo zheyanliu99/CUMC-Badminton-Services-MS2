@@ -70,6 +70,16 @@ def get_session_by_key(sessionid):
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     return rsp
 
+@app.route("/api/session/user/<userid>", methods=["GET"])
+def get_session_by_user(userid):
+
+    result = CBSresource.get_session_by_user(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    return rsp
+
 @app.route("/api/session/<sessionid>/enroll/<userid>", methods=["GET"])
 def enroll_session(sessionid, userid):
 

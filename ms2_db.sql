@@ -64,6 +64,12 @@ INSERT INTO waitlist (sessionid, userid) VALUES (2,1);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,2);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,4);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,5);
+INSERT INTO waitlist (sessionid, userid) VALUES (3,1);
+INSERT INTO waitlist (sessionid, userid) VALUES (3,3);
+INSERT INTO waitlist (sessionid, userid) VALUES (4,3);
+INSERT INTO waitlist (sessionid, userid) VALUES (4,4);
+INSERT INTO waitlist (sessionid, userid) VALUES (4,5);
+INSERT INTO waitlist (sessionid, userid) VALUES (5,1);
 DELETE FROM waitlist WHERE userid=1 AND sessionid=1;
 
 SELECT * FROM users;
