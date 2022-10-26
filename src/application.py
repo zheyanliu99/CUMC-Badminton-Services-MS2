@@ -15,13 +15,13 @@ app = Flask(__name__,
 cors = CORS(app, resources={r'/api/*':{'origins':'*'}})
 
 
-@app.route("/api/students/<uni>", methods=["GET"])
-def get_student_by_uni(uni):
+@app.route("/api/user/<id>", methods=["GET"])
+def get_user_by_id(id):
 
-    result = CBSresource.get_user_by_key(uni)
+    result = CBSresource.get_user_by_key(id)
 
     if result:
-        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     else:
         rsp = Response("NOT FOUND", status=404, content_type="text/plain")
 

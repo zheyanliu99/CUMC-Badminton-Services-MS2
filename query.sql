@@ -24,3 +24,5 @@ FROM (SELECT * FROM ms2_db.sessions
 LEFT JOIN ms2_db.waitlist w
 ON s.sessionid = w.sessionid
 GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity;
+
+SELECT * FROM ms2_db.users WHERE userid = 1;
