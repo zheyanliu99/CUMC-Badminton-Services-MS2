@@ -35,7 +35,6 @@ class CBSresource:
         cur = conn.cursor()
         cur.execute(sql, args=key)
         res = cur.fetchone()
-        print(res)
         if res:
             res['birthday'] = str(res['birthday'])
             result = {'success':True, 'data':res}
