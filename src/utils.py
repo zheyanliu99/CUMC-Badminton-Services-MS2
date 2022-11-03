@@ -9,3 +9,4 @@ class DTEncoder(json.JSONEncoder):
             return str(obj)
         # 👇️ otherwise use the default behavior
         return json.JSONEncoder.default(self, obj)
+

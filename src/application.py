@@ -53,6 +53,7 @@ def register():
 
 @app.route("/api/session", methods=["POST"])
 def get_available_session():
+    print(request.data)
     result = CBSresource.get_available_session(request.data)
     if result['success']:
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")

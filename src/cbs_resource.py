@@ -3,6 +3,7 @@ import pymysql
 import os
 from datetime import datetime
 from utils import DTEncoder
+import requests
 
 
 class CBSresource:
@@ -26,6 +27,20 @@ class CBSresource:
             autocommit=True
         )
         return conn
+
+    # Methods from MS1
+    @staticmethod
+    def _get_partner_id(userid):
+
+        # set by environment variables
+        baseURL = os.environ.get("MS1_URL")
+        userid = 22
+        partnerid = None
+        res = requests.get(baseURL + f'api/user/{userid}/partner').json()
+        if res['success']:
+            data = res['data'][0]
+            partnerid = list(data.values())[0]
+        return partnerid
 
     @staticmethod
     def get_user_by_key(key):
@@ -88,12 +103,12 @@ class CBSresource:
                  FROM ms2_db.sessions s
                  LEFT JOIN ms2_db.waitlist w
                  ON s.sessionid = w.sessionid
-                 WHERE w.userid = %s) t2
+                 WHERE w.userid = %s OR w.partnerid = %s) t2
                  ON t1.sessionid = t2.sessionid"""
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         try:
-            cur.execute(sql, args=(datetime.now(), userid))
+            cur.execute(sql, args=(datetime.now(), userid, userid))
             # if register success
             res = cur.fetchall()
             if res:
@@ -146,7 +161,7 @@ class CBSresource:
         SELECT s.sessionid, begintime, endtime, s.notes, s.capacity, count(1) enrolled
         FROM (SELECT * FROM ms2_db.sessions
               WHERE endtime > %s
-              AND sessionid in (SELECT sessionid FROM ms2_db.waitlist WHERE userid = %s) )s
+              AND sessionid in (SELECT sessionid FROM ms2_db.waitlist WHERE userid = %s or partnerid = %s) )s
         LEFT JOIN ms2_db.waitlist w
         ON s.sessionid = w.sessionid
         GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity;
@@ -154,7 +169,7 @@ class CBSresource:
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         try:
-            cur.execute(sql, args=(datetime.now(), userid))
+            cur.execute(sql, args=(datetime.now(), userid, userid))
             res = cur.fetchall()
             # if fetched successful
             if res:

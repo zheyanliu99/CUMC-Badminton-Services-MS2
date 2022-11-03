@@ -33,6 +33,7 @@ CREATE TABLE waitlist
     sessionid int,
     userid int,
     updatetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    partnerid int,
     notes varchar(255),
     PRIMARY KEY (sessionid, userid),
     FOREIGN KEY (sessionid) REFERENCES sessions(sessionid) ON DELETE CASCADE,
@@ -50,16 +51,16 @@ INSERT INTO users (email, password, username, sex, birthday, credits ) VALUES ('
 INSERT INTO users (email, password, username, sex, birthday, credits ) VALUES ('test@test.com', '123456', 'mushroom', 'male', '2021-01-01', '100');
 INSERT INTO users (email, password, username, sex, birthday) VALUES ('test6@test.com', '123456', 'panda', 'female', '2010-01-01');
 
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-27 18:30:00', '2022-10-27 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-28 18:30:00', '2022-10-28 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-29 18:30:00', '2022-10-29 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-29 19:30:00', '2022-10-29 20:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-27 18:30:00', '2022-11-27 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-28 18:30:00', '2022-11-28 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-29 18:30:00', '2022-11-29 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-29 19:30:00', '2022-11-29 20:30:00');
 INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-17 19:30:00', '2022-10-17 20:30:00');
 INSERT INTO sessions (begintime, endtime, notes) VALUES ('2022-10-30 18:30:00', '2022-10-30 19:30:00', 'Welcome');
 
 INSERT INTO waitlist (sessionid, userid, notes) VALUES (1,1, 'Enjoy');
 INSERT INTO waitlist (sessionid, userid, notes) VALUES (1,3, 'Welcome');
-INSERT INTO waitlist (sessionid, userid) VALUES (1,6);
+INSERT INTO waitlist (sessionid, userid, partnerid) VALUES (1,6,2);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,1);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,2);
 INSERT INTO waitlist (sessionid, userid) VALUES (2,4);
