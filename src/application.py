@@ -53,7 +53,6 @@ def register():
 
 @app.route("/api/session", methods=["POST"])
 def get_available_session():
-    print(request.data)
     result = CBSresource.get_available_session(request.data)
     if result['success']:
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
@@ -81,10 +80,10 @@ def get_session_by_user(userid):
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     return rsp
 
-@app.route("/api/session/<sessionid>/enroll/<userid>", methods=["GET"])
+@app.route("/api/session/<sessionid>/enroll/<userid>", methods=["POST"])
 def enroll_session(sessionid, userid):
-
-    result = CBSresource.enroll_session(sessionid, userid)
+    print(request.data)
+    result = CBSresource.enroll_session(sessionid, userid, with_partner=int(request.data))
     if result['success']:
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     else:

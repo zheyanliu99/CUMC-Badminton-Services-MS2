@@ -26,3 +26,14 @@ ON s.sessionid = w.sessionid
 GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity;
 
 SELECT * FROM ms2_db.users WHERE userid = 1;
+
+-- if already in wait list as user or partner
+SELECT * FROM ms2_db.waitlist
+WHERE (userid = 2 or partnerid = 2)
+AND sessionid = 1;
+
+-- update partnerid in waitlist
+UPDATE ms2_db.waitlist
+SET partnerid = NULL
+WHERE sessionid = 1 AND partnerid = 2;
+SELECT * FROM ms2_db.waitlist;

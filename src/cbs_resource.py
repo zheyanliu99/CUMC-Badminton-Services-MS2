@@ -34,7 +34,6 @@ class CBSresource:
 
         # set by environment variables
         baseURL = os.environ.get("MS1_URL")
-        userid = 22
         partnerid = None
         res = requests.get(baseURL + f'api/user/{userid}/partner').json()
         if res['success']:
@@ -140,19 +139,65 @@ class CBSresource:
         return result 
 
     @staticmethod
-    def enroll_session(sessionid, userid):
-        sql = "INSERT INTO ms2_db.waitlist (sessionid, userid) VALUES (%s, %s)"
+    def enroll_session(sessionid, userid, with_partner):
         conn = CBSresource._get_connection()
         cur = conn.cursor()
-        try:
-            cur.execute(sql, args=(sessionid, userid))
-            # if register success
-            result = {'success':True, 'message':'You have joined the waitlist'}
 
-        except pymysql.Error as e:
-            print(e)
-            res = 'ERROR'
-            result = {'success':False, 'message':str(e)}
+        # not with partner
+        if with_partner == 0:
+            # check if already exist as user or partner
+            sql = """
+                SELECT * FROM ms2_db.waitlist
+                WHERE (userid = %s or partnerid = %s)
+                AND sessionid = %s;
+            """
+            cur.execute(sql, args=(userid, userid, sessionid))
+            res = cur.fetchone()
+            # if already exist
+            if res:
+                result = {'success':False, 'message':'Failed. You have already joined this waitlist'}
+            # otherwise insert into waitlist
+            else:
+                sql = "INSERT INTO ms2_db.waitlist (sessionid, userid) VALUES (%s, %s)"
+                try:
+                    cur.execute(sql, args=(sessionid, userid))
+                    # if register success
+                    result = {'success':True, 'message':'You have joined the waitlist'}
+                except pymysql.Error as e:
+                    print(e)
+                    res = 'ERROR'
+                    result = {'success':False, 'message':str(e)}
+
+        # with partner
+        else:
+            # if not with partner
+            partnerid = CBSresource._get_partner_id(userid)
+            if not partnerid:
+                result = {'success':False, 'message':'You do not have a partner'}
+                return result
+            # check if you or partner is already in
+            sql = """
+                SELECT * FROM ms2_db.waitlist
+                WHERE (userid = %s or partnerid = %s)
+                AND sessionid = %s;
+            """
+            cur.execute(sql, args=(userid, userid, sessionid))
+            res = cur.fetchone()
+            if res:
+                result = {'success':False, 'message':'Failed. Your partner or you have already joined this waitlist'}
+                return result 
+            # otherwise begin the joinning process
+            sql = "INSERT INTO ms2_db.waitlist (sessionid, userid, partnerid) VALUES (%s, %s, %s)"
+            try:
+                cur.execute(sql, args=(sessionid, userid, partnerid))
+                # if register success
+                result = {'success':True, 'message':'You have both joined the waitlist. Please inform your partner'}
+            except pymysql.Error as e:
+                print(e)
+                res = 'ERROR'
+                result = {'success':False, 'message':str(e)}
+            
+
         return result 
 
     @staticmethod
@@ -186,18 +231,32 @@ class CBSresource:
     @staticmethod
     def quit_waitlist(sessionid, userid):
         sql_p = "SELECT * FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
-        sql = "DELETE FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
+        sql_q = "SELECT * FROM ms2_db.waitlist WHERE partnerid = %s AND sessionid = %s;"
         conn = CBSresource._get_connection()
         cur = conn.cursor()
+        cur.execute(sql_p, args=(userid, sessionid))
+        res_p = cur.fetchone()
+        cur.execute(sql_q, args=(userid, sessionid))
+        res_q = cur.fetchone()
         try:
-            cur.execute(sql_p, args=(userid, sessionid))
-            res = cur.fetchone()
-            if res:
+            if res_p:
+                sql = "DELETE FROM ms2_db.waitlist WHERE userid = %s AND sessionid = %s;"
                 cur.execute(sql, args=(userid, sessionid))
                 # if register success
                 result = {'success':True, 'message':'You have quitted the waitlist'}
-            else:
-                result = {'success':False, 'message':'You are not in the waitlist'}
+                return result
+            if res_q:
+                sql = """
+                    UPDATE ms2_db.waitlist
+                    SET partnerid = NULL
+                    WHERE sessionid = %s AND partnerid = %s;
+                """
+                cur.execute(sql, args=(sessionid, userid))
+                # if register success
+                result = {'success':True, 'message':'You have quitted the waitlist as a partner'}      
+                return result 
+            
+            result = {'success':False, 'message':'You are not in the waitlist'}
 
         except pymysql.Error as e:
             print(e)
