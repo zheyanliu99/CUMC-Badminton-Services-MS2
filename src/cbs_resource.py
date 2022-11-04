@@ -178,10 +178,10 @@ class CBSresource:
             # check if you or partner is already in
             sql = """
                 SELECT * FROM ms2_db.waitlist
-                WHERE (userid = %s or partnerid = %s)
+                WHERE (userid in (%s, %s) or partnerid in (%s, %s))
                 AND sessionid = %s;
             """
-            cur.execute(sql, args=(userid, userid, sessionid))
+            cur.execute(sql, args=(userid, partnerid, userid, partnerid, sessionid))
             res = cur.fetchone()
             if res:
                 result = {'success':False, 'message':'Failed. Your partner or you have already joined this waitlist'}

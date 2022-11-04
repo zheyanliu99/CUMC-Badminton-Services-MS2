@@ -29,7 +29,7 @@ SELECT * FROM ms2_db.users WHERE userid = 1;
 
 -- if already in wait list as user or partner
 SELECT * FROM ms2_db.waitlist
-WHERE (userid = 2 or partnerid = 2)
+WHERE (userid in (1, 2) or partnerid = 2)
 AND sessionid = 1;
 
 -- update partnerid in waitlist
