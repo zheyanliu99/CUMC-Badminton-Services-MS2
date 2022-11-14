@@ -99,7 +99,63 @@ def quit_waitlist(sessionid, userid):
     else:
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     return rsp
+@app.route("/api/user/reset", methods=["POST"])
+def reset():
+    if request.method == 'POST':
+        user_id_res = CBSresource.reset_password(request.get_json()['email'], request.get_json()['old_password'],
+                                                 request.get_json()['new_password'])
+        if user_id_res:
+            result = {'success': True, 'message': 'changing successful'}
+            rsp = Response(json.dumps(result), status=200, content_type="application.json")
+        else:
+            result = {'success': False, 'message': 'Wrong username or password'}
+            rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response("Methods not defined", status=404, content_type="text/plain")
+    return rsp
 
+@app.route("/api/userprofile/<userid>", methods=["GET"])
+def show(userid):
+    result = CBSresource.show_profile(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result, default=str), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, default=str), status=404, content_type="application.json")
+    return rsp
+
+@app.route("/api/userprofile2/<userid>", methods=["GET"])
+def show2(userid):
+    result = CBSresource.show_profile2(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+    return rsp
+
+@app.route("/api/userprofile/edit/<userid>", methods=["POST"])
+def edit(userid):
+    ## where post id is important
+    if request.method == 'POST':
+        result = CBSresource.edit_profile(request.get_json()['username'], request.get_json()['sex'],
+                                          request.get_json()['birthday'],
+                                          request.get_json()['preference'],
+                                          request.get_json()['email'],
+                                          #  request.get_json()['credits'],
+                                          userid)
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response("Methods not defined", status=404, content_type="text/plain")
+    return rsp
+
+
+@app.route("/api/check_partner/<userid>", methods=["GET"])
+def check_partner(userid):
+    result = CBSresource.show_profile2(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+    return rsp
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5011, debug=True)
