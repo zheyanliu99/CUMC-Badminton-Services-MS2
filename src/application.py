@@ -133,6 +133,24 @@ def most_recent_user():
         rsp = Response("Methods not defined", status=404, content_type="text/plain")
     return rsp
 
+@app.route("/api/searchprofile", methods=["POST"])
+def show_search():
+    result = CBSresource.show_profile_by_email(request.get_json()['email'], request.get_json()['number'])
+    if result['success']:
+        rsp = Response(json.dumps(result, default=str), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, default=str), status=404, content_type="application.json")
+    return rsp
+
+@app.route("/api/searchprofile2", methods=["POST"])
+def show_search_2():
+    result = CBSresource.show_profile_by_email_2(request.get_json()['email'])
+    if result['success']:
+        rsp = Response(json.dumps(result, default=str), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, default=str), status=404, content_type="application.json")
+    return rsp
+
 @app.route("/api/user/register", methods=["POST"])
 def register():
     if request.method == 'POST':

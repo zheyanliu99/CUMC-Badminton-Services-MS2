@@ -388,4 +388,38 @@ class CBSresource:
             result = {'success': False, 'message': str(e)}
         return result
 
+    def show_profile_by_email(email, number):
+        sql = "Select userid, email, username, sex, preference, credits, birthday \
+            FROM ms2_db.users WHERE email like  %s limit %s; "
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args=('%%%s%%' %email, number))
+            res = cur.fetchall()
+            if res:
+                result = {'success': True, 'data': res}
+            else:
+                result = {'success': False, 'message': 'Emails Not Found', 'data': res}
+        except pymysql.Error as e:
+            print(e)
+            result = {'success': False, 'message': str(e)}
+        return result
+
+    def show_profile_by_email_2(email):
+        sql = "Select userid, email, username, sex, preference, credits, birthday \
+            FROM ms2_db.users WHERE email  =%s; "
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args=(email))
+            res = cur.fetchall()
+            if res:
+                result = {'success': True, 'data': res}
+            else:
+                result = {'success': False, 'message': 'Emails Not Found', 'data': res}
+        except pymysql.Error as e:
+            print(e)
+            result = {'success': False, 'message': str(e)}
+        return result
+
 # %%
