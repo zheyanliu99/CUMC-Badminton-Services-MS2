@@ -17,6 +17,6 @@ pip install -r requirements.txt
 ```bash
 export MS1_URL=http://localhost:5010/
 export WEB_APP_URL=http://localhost:4200/
-export GOOGLE_CLIENT_ID=432898219349-ufa3r6877k4b3uo7bm8ciiu70vfeh0lb.apps.goog$
+export GOOGLE_CLIENT_ID=432898219349-ufa3r6877k4b3uo7bm8ciiu70vfeh0lb.apps.googleusercontent.com
 export GOOGLE_CLIENT_SECRET=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
 ```
