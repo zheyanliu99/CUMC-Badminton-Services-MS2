@@ -9,7 +9,7 @@ Use [ms2_db.sql](ms2_db.sql) to init database before running application.py.
 Please do the following to make it work
 * Reinstall requirements.txt
 ```
-pip install -r /path/to/requirements.txt
+pip install -r requirements.txt
 ```
 * Re-init the database using [ms2_db.sql](ms2_db.sql)
 * Set up environment variables
