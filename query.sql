@@ -37,3 +37,14 @@ UPDATE ms2_db.waitlist
 SET partnerid = NULL
 WHERE sessionid = 1 AND partnerid = 2;
 SELECT * FROM ms2_db.waitlist;
+
+UPDATE users
+SET password = 1234
+WHERE userid=5;
+
+SELECT t2.* FROM
+(
+SELECT * FROM USERS
+WHERE updatetime = (SELECT max(updatetime) FROM users)) t1
+LEFT JOIN USERS t2
+ON t1.userid = t2.userid;

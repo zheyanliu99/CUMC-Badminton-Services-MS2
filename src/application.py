@@ -1,9 +1,12 @@
-from flask import Flask, Response, request
+from flask import Flask, Response, request, redirect, url_for
 from datetime import datetime
 import json
 from cbs_resource import CBSresource
 from flask_cors import CORS
 from utils import DTEncoder
+from oauthlib.oauth2 import WebApplicationClient
+import os
+import requests
 
 # Create the Flask application object.
 app = Flask(__name__,
@@ -14,6 +17,17 @@ app = Flask(__name__,
 # CORS(app)
 cors = CORS(app, resources={r'/api/*':{'origins':'*'}})
 
+# Google OAuth
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+def get_google_provider_cfg():
+    return requests.get(GOOGLE_DISCOVERY_URL).json()
 
 @app.route("/api/user/<id>", methods=["GET"])
 def get_user_by_id(id):
@@ -28,16 +42,93 @@ def get_user_by_id(id):
     print(result)
     return rsp
 
-@app.route("/api/user/login", methods=["POST"])
+@app.route("/api/login", methods=["GET"])
 def login():
-    if request.method == 'POST':
-        user_id_res = CBSresource.verify_login(request.get_json()['email'], request.get_json()['password'])
-        if user_id_res:
-            result = {'success':True, 'message':'login successful','userId':user_id_res}
-            rsp = Response(json.dumps(result), status=200, content_type="application.json")
-        else: 
-            result = {'success':False, 'message':'Wrong username or password'}
-            rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    print('login 1')
+    # Find out what URL to hit for Google login
+    google_provider_cfg = get_google_provider_cfg()
+    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+    print(authorization_endpoint)
+
+    # Use library to construct the request for login and provide
+    # scopes that let you retrieve user's profile from Google
+    request_uri = client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.base_url + "/callback",
+        scope=["openid", "email", "profile"],
+    )
+    print(request_uri)
+    print(request.base_url + "/callback")
+    rsp = Response(json.dumps({'request_uri' : request_uri}, cls=DTEncoder), status=200, content_type="application.json")
+    return rsp
+
+@app.route("/api/login/callback", methods=["GET", "POST"])
+def callback():
+    # Get authorization code Google sent back to you
+    print('Begin callback')
+    code = request.args.get("code")
+    print('callback 1')
+    print(code)
+    print(request.url)
+    print(request.base_url)
+
+    # Find out what URL to hit to get tokens that allow you to ask for
+    # things on behalf of a user
+    google_provider_cfg = get_google_provider_cfg()
+    token_endpoint = google_provider_cfg["token_endpoint"]
+    print(token_endpoint)
+    print('callback 2')
+    # Prepare and send request to get tokens! Yay tokens!
+    token_url, headers, body = client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code,
+    )
+    print(token_url)
+    print('callback 3')
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
+    )
+
+    # Parse the tokens!
+    print('callback 4')
+    client.parse_request_body_response(json.dumps(token_response.json()))
+
+    # Now that we have tokens (yay) let's find and hit URL
+    # from Google that gives you user's profile information,
+    # including their Google Profile Image and Email
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    print(userinfo_endpoint)
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
+
+    # We want to make sure their email is verified.
+    # The user authenticated with Google, authorized our
+    # app, and now we've verified their email through Google!
+    if userinfo_response.json().get("email_verified"):
+        unique_id = userinfo_response.json()["sub"]
+        users_email = userinfo_response.json()["email"]
+        picture = userinfo_response.json()["picture"]
+        users_name = userinfo_response.json()["given_name"]
+    else:
+        return "User email not available or not verified by Google.", 400
+    
+    CBSresource.process_google_login(userinfo_response.json())
+    rsp = Response(json.dumps(userinfo_response.json(), cls=DTEncoder), status=200, content_type="application.json")
+    # Send user back to homepage
+    # return Response(status = 204)
+    return redirect(os.environ.get("WEB_APP_URL"))
+
+
+@app.route("/api/login/mostrecent", methods=["GET"])
+def most_recent_user():
+    if request.method == 'GET':
+        result = CBSresource.get_most_recent_login()
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     else:
         rsp = Response("Methods not defined", status=404, content_type="text/plain")
     return rsp

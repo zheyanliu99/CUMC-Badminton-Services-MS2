@@ -6,7 +6,6 @@ from utils import DTEncoder
 import requests
 
 
-
 class CBSresource:
 
     def __int__(self):
@@ -42,21 +41,44 @@ class CBSresource:
         return partnerid
 
     @staticmethod
-    def get_user_by_key(key):
+    def process_google_login(user_info):
 
-        sql = "SELECT * FROM ms2_db.users where userid=%s"
         conn = CBSresource._get_connection()
         cur = conn.cursor()
-        cur.execute(sql, args=key)
+        # if user not exist, insert into user table
+        sql = "SELECT * FROM ms2_db.users where email=%s"
+        cur.execute(sql, args=user_info['email'])
         res = cur.fetchone()
-        if res:
-            res['birthday'] = str(res['birthday'])
-            result = {'success': True, 'data': res}
-        else:
-            result = {'success': False, 'message': 'Not Found', 'data': res}
+        if not res:
+            print('insert new user')
+            sql_i = "INSERT INTO ms2_db.users (email, username, profile_pic) VALUES (%s, %s, %s);"
+            cur.execute(sql_i, args=(user_info['email'], user_info['name'], user_info['picture']))
+            sql = "SELECT * FROM ms2_db.users where email=%s"
+            cur.execute(sql, args=user_info['email'])
+            res = cur.fetchone()
+        # insert into login_log table
+        sql_i = "INSERT INTO ms2_db.login_log (userid) VALUES (%s)"
+        cur.execute(sql_i, args=(res['userid']))
+        print("inserted to login log")
+        
+    @staticmethod
+    def get_most_recent_login():
 
-        return result
-
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        # if user not exist, insert into user table
+        sql = """
+            SELECT t2.* FROM
+            (
+            SELECT * FROM ms2_db.USERS
+            WHERE updatetime = (SELECT max(updatetime) FROM ms2_db.users)) t1
+            LEFT JOIN ms2_db.USERS t2
+            ON t1.userid = t2.userid;
+        """
+        cur.execute(sql)
+        res = cur.fetchone()
+        return res
+        
     @staticmethod
     def verify_login(email, password):
 
