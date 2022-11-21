@@ -38,7 +38,7 @@ class CBSresource:
         print(res)
         if res['success']:
             print(res)
-            data = res['data'][1]
+            data = res['data'][0]
             partnerid = list(data.values())[0]
         return partnerid
 
