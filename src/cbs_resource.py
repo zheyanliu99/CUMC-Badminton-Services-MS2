@@ -56,6 +56,7 @@ class CBSresource:
             sql = "SELECT * FROM ms2_db.users where email=%s"
             cur.execute(sql, args=user_info['email'])
             res = cur.fetchone()
+            print(res)
         # insert into login_log table
         sql_i = "INSERT INTO ms2_db.login_log (userid) VALUES (%s)"
         cur.execute(sql_i, args=(res['userid']))
