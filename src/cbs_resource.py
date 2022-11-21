@@ -35,7 +35,9 @@ class CBSresource:
         baseURL = os.environ.get("MS1_URL")
         partnerid = None
         res = requests.get(baseURL + f'api/user/{userid}/partner').json()
+        print(res)
         if res['success']:
+            print(res)
             data = res['data'][1]
             partnerid = list(data.values())[0]
         return partnerid
