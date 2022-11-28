@@ -111,6 +111,22 @@ class CBSresource:
         return result
 
     @staticmethod
+    def if_admin(userid):
+
+        sql = "SELECT * FROM ms2_db.users WHERE userid = %s and role = 'Admin'"
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            res = cur.execute(sql, args=(userid))
+            # if register success
+            result = True if res else False
+            
+        except pymysql.Error as e:
+            print(e)
+            result = {'success': False, 'message': 'This email is already registered, try another one'}
+        return result
+
+    @staticmethod
     def get_available_session(userid):
 
         sql = """SELECT t1.*, (CASE WHEN t2.sessionid IS NULL THEN 0 ELSE 1 END) is_registered
@@ -300,6 +316,7 @@ class CBSresource:
         cur = conn.cursor()
         cur.execute(sql, args=(sessionid, sessionid))
         res = cur.fetchall()
+        result = {'success': False, 'message': f"No record for session {sessionid}"}
         print(res)
         if res:
             candidate_users = [a['userid'] for a in res]

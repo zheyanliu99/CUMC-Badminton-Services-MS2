@@ -38,6 +38,10 @@ def before_decorator():
     print(request.values)
     print(request.url)
     print(request.url_rule)
+    print(request.data)
+    if str(request.url_rule)[:11] == "/api/admin/":
+        if not CBSresource.if_admin(int(request.data)):
+            raise NameError('You are not an admin')
 
 @app.after_request
 def after_decorator(rsp):

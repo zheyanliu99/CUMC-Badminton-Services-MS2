@@ -70,6 +70,7 @@ INSERT INTO users (email, username, sex, birthday, credits ) VALUES ('test2@test
 INSERT INTO users (email, username, sex, birthday, credits ) VALUES ('test1@test.com', 'banana', 'male', '2022-01-01', '100');
 INSERT INTO users (email, username, sex, birthday, credits ) VALUES ('test@test.com', 'mushroom', 'male', '2021-01-01', '100');
 INSERT INTO users (email, username, sex, birthday) VALUES ('test6@test.com', 'panda', 'female', '2010-01-01');
+INSERT INTO users (email, username, sex, birthday, role) VALUES ('admin@test.com', 'admin', 'female', '2000-01-01', 'Admin');
 
 INSERT INTO login_log(userid) VALUES (1);
 INSERT INTO login_log(userid) VALUES (3);
