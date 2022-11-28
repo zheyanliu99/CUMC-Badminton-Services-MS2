@@ -18,6 +18,7 @@ CREATE TABLE users
     preference ENUM('Double', 'Single'),
     credits	int default 100,
     profile_pic varchar(255),
+    role ENUM('User', 'Admin') default 'User',
     updatetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
@@ -91,5 +92,11 @@ SELECT * FROM users;
 SELECT * FROM sessions;
 SELECT * FROM waitlist;
 SELECT * FROM login_log;
+
+# create an admin zheyan.liu@columbia.edu
+UPDATE ms2_db.users
+SET role = 'Admin'
+WHERE email = 'zheyan.liu@columbia.edu'
+SELECT * FROM ms2_db.users;
 
 

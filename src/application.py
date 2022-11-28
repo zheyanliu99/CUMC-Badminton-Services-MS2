@@ -1,4 +1,4 @@
-from flask import Flask, Response, request, redirect, url_for
+from flask import Flask, Response, request, redirect, url_for, make_response
 from datetime import datetime
 import json
 from cbs_resource import CBSresource
@@ -28,6 +28,22 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
+
+
+@app.before_request
+def before_decorator():
+    print('Before request I should do...')
+    # Verify it is an admin or a user
+    print(request.form)
+    print(request.values)
+    print(request.url)
+    print(request.url_rule)
+
+@app.after_request
+def after_decorator(rsp):
+    print('After request I should do...')
+    print(rsp.data)
+    return rsp
 
 @app.route("/api/user/<id>", methods=["GET"])
 def get_user_by_id(id):
@@ -121,8 +137,23 @@ def callback():
     rsp = Response(json.dumps(userinfo_response.json(), cls=DTEncoder), status=200, content_type="application.json")
     # Send user back to homepage
     # return Response(status = 204)
-    return redirect(os.environ.get("WEB_APP_URL"))
+    response = make_response(redirect(os.environ.get("WEB_APP_URL")))
+    response.set_cookie('cookie_msg_demo', 'gggg8888')
 
+    return response
+
+@app.route("/api/setcookie", methods=["GET"])
+def set_cookie():
+    response = make_response(redirect("https://www.google.com"))
+    response.set_cookie('COOKIE_MSG_DEMO', 'gggg8888')
+    return response
+
+@app.route("/api/setheader", methods=["GET"])
+def set_header():
+    response = Response()
+    # response.headers["Deomo_header"] = "gggg7777"
+    response.set_cookie('COOKIE_MSG_DEMO', 'gggg8888')
+    return response
 
 @app.route("/api/login/mostrecent", methods=["GET"])
 def most_recent_user():
