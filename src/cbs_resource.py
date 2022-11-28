@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from utils import DTEncoder
 import requests
+import random
 
 
 class CBSresource:
@@ -286,6 +287,37 @@ class CBSresource:
             print(e)
             res = 'ERROR'
             result = {'success': False, 'message': str(e)}
+        return result
+    
+    @staticmethod
+    def waitlist_approve(sessionid):
+        sql = """
+            SELECT userid FROM ms2_db.waitlist
+            WHERE sessionid = %s
+            AND userid not in (SELECT userid FROM ms2_db.sessions_enrolled WHERE sessionid = %s);
+        """
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        cur.execute(sql, args=(sessionid, sessionid))
+        res = cur.fetchall()
+        print(res)
+        if res:
+            candidate_users = [a['userid'] for a in res]
+            if len(candidate_users) <= 6:
+                approved_users = candidate_users
+            else:
+                approved_users = random.sample(candidate_users, k = 6)
+            try:
+                for userid in approved_users:
+                    sql = "INSERT INTO ms2_db.sessions_enrolled (sessionid, userid) VALUES (%s, %s)"
+                    cur.execute(sql, args=(sessionid, userid))
+                result = {'success': True, 'message': f'Following users joined the session: {approved_users}'}
+            except pymysql.Error as e:
+                print(e)
+                res = 'ERROR'
+                result = {'success': False, 'message': str(e)}
+            
+
         return result
 
     @staticmethod

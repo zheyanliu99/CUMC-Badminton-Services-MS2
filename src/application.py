@@ -239,6 +239,17 @@ def quit_waitlist(sessionid, userid):
     else:
         rsp = Response(json.dumps(result), status=200, content_type="application.json")
     return rsp
+
+@app.route("/api/admin/session/approve/<sessionid>", methods=["POST"])
+def waitlist_approve(sessionid):
+
+    result = CBSresource.waitlist_approve(sessionid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    return rsp
+
 @app.route("/api/user/reset", methods=["POST"])
 def reset():
     if request.method == 'POST':

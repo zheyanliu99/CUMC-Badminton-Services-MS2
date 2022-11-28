@@ -3,6 +3,7 @@ use ms2_db;
 -- Drop table
 DROP TABLE IF EXISTS waitlist;
 DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS sessions_enrolled;
 DROP TABLE IF EXISTS login_log;
 DROP TABLE IF EXISTS users;
 
@@ -38,6 +39,15 @@ CREATE TABLE sessions
     notes varchar(255)
 );
 
+CREATE TABLE sessions_enrolled
+(
+    sessionid int,
+    updatetime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    userid int,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE,
+    PRIMARY KEY (sessionid, userid)
+);
+
 CREATE TABLE waitlist
 (
     sessionid int,
@@ -66,11 +76,15 @@ INSERT INTO login_log(userid) VALUES (3);
 INSERT INTO login_log(userid) VALUES (5);
 INSERT INTO login_log(userid) VALUES (1);
 
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-27 18:30:00', '2022-11-27 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-28 18:30:00', '2022-11-28 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-29 18:30:00', '2022-11-29 19:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-29 19:30:00', '2022-11-29 20:30:00');
-INSERT INTO sessions (begintime, endtime) VALUES ('2022-10-17 19:30:00', '2022-10-17 20:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-20 18:30:00', '2022-12-20 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-21 18:30:00', '2022-12-21 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-22 18:30:00', '2022-12-22 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-23 18:30:00', '2022-12-23 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-27 18:30:00', '2022-12-27 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-28 18:30:00', '2022-12-28 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-29 18:30:00', '2022-12-29 19:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-12-29 19:30:00', '2022-12-29 20:30:00');
+INSERT INTO sessions (begintime, endtime) VALUES ('2022-11-17 19:30:00', '2022-11-17 20:30:00');
 INSERT INTO sessions (begintime, endtime, notes) VALUES ('2022-10-30 18:30:00', '2022-10-30 19:30:00', 'Welcome');
 
 INSERT INTO waitlist (sessionid, userid, notes) VALUES (1,1, 'Enjoy');
@@ -86,6 +100,14 @@ INSERT INTO waitlist (sessionid, userid) VALUES (4,3);
 INSERT INTO waitlist (sessionid, userid) VALUES (4,4);
 INSERT INTO waitlist (sessionid, userid) VALUES (4,5);
 INSERT INTO waitlist (sessionid, userid) VALUES (5,1);
+INSERT INTO waitlist (sessionid, userid) VALUES (6,2);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,4);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,3);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,6);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,1);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,2);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,7);
+INSERT INTO waitlist (sessionid, userid) VALUES (7,5);
 DELETE FROM waitlist WHERE userid=1 AND sessionid=1;
 
 SELECT * FROM users;

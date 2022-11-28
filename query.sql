@@ -48,3 +48,7 @@ SELECT * FROM USERS
 WHERE updatetime = (SELECT max(updatetime) FROM users)) t1
 LEFT JOIN USERS t2
 ON t1.userid = t2.userid;
+
+SELECT userid FROM ms2_db.waitlist
+WHERE sessionid = 1
+AND userid not in (SELECT userid FROM ms2_db.sessions_enrolled WHERE sessionid = 1);
