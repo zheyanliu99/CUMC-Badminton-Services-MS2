@@ -74,9 +74,9 @@ class CBSresource:
         sql = """
             SELECT t2.* FROM
             (
-            SELECT * FROM ms2_db.USERS
+            SELECT * FROM ms2_db.users
             WHERE updatetime = (SELECT max(updatetime) FROM ms2_db.users)) t1
-            LEFT JOIN ms2_db.USERS t2
+            LEFT JOIN ms2_db.users t2
             ON t1.userid = t2.userid;
         """
         cur.execute(sql)
