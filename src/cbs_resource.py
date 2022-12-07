@@ -71,8 +71,9 @@ class CBSresource:
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         # if user not exist, insert into user table
+        # not show all res
         sql = """
-            SELECT t2.* FROM
+            SELECT t2.userid, t2.email, t2.username, t2.sex, t2.preference, t2.credits, t2.profile_pic, t2.role FROM
             (
             SELECT * FROM ms2_db.users
             WHERE updatetime = (SELECT max(updatetime) FROM ms2_db.users)) t1
