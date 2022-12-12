@@ -50,8 +50,12 @@ class CBSresource:
         cur = conn.cursor()
         # if user not exist, insert into user table
         sql = "SELECT * FROM ms2_db.users where email=%s"
+        print(user_info)
+        print(user_info['email'])
         cur.execute(sql, args=user_info['email'])
         res = cur.fetchone()
+        if res:
+            result = {'success': True, 'message': f'Hi {res["username"]}, you have logged in', 'data': res}
         if not res:
             print('insert new user')
             sql_i = "INSERT INTO ms2_db.users (email, username, profile_pic) VALUES (%s, %s, %s);"
@@ -59,11 +63,11 @@ class CBSresource:
             sql = "SELECT * FROM ms2_db.users where email=%s"
             cur.execute(sql, args=user_info['email'])
             res = cur.fetchone()
-            print(res)
+            result = {'success': True, 'message': f'Hi {res["username"]}, you have registered and logged in', 'data': res}
         # insert into login_log table
         sql_i = "INSERT INTO ms2_db.login_log (userid) VALUES (%s)"
         cur.execute(sql_i, args=(res['userid']))
-        print("inserted to login log")
+        return result
         
     @staticmethod
     def get_most_recent_login():
@@ -83,6 +87,27 @@ class CBSresource:
         cur.execute(sql)
         res = cur.fetchone()
         return res
+
+    @staticmethod
+    def get_user_by_email(email):
+
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        # if user not exist, insert into user table
+        # not show all res
+        sql = """
+            SELECT t2.userid, t2.email, t2.username, t2.sex, t2.preference, t2.credits, t2.profile_pic, t2.role FROM
+            (
+            SELECT * FROM ms2_db.users
+            WHERE email = %s);
+        """
+        cur.execute(sql, email)
+        res = cur.fetchone()
+        if res:
+            result = {'success': True, 'message': 'Found user', 'data': res}
+        else: 
+            result = {'success': False, 'message': 'User not found'}
+        return result
         
     @staticmethod
     def verify_login(email, password):

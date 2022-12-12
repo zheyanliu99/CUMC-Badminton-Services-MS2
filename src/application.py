@@ -146,6 +146,12 @@ def callback():
 
     return response
 
+
+@app.route("/api/googlelogin", methods=["POST"])
+def google_login():
+    response = CBSresource.process_google_login(request.get_json())
+    return response
+
 @app.route("/api/setcookie", methods=["GET"])
 def set_cookie():
     response = make_response(redirect("https://www.google.com"))
