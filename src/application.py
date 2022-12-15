@@ -7,6 +7,7 @@ from utils import DTEncoder
 from oauthlib.oauth2 import WebApplicationClient
 import os
 import requests
+from sns_new_trial import SNS
 
 # Create the Flask application object.
 app = Flask(__name__,
@@ -150,6 +151,28 @@ def callback():
 @app.route("/api/googlelogin", methods=["POST"])
 def google_login():
     response = CBSresource.process_google_login(request.get_json())
+    ## login set sns
+    result = CBSresource.show_profile_by_email(request.json["email"], 1)
+    email = result["data"][0]['email']
+    id = result["data"][0]['userid']
+    print(email)
+    print(id)
+    content = "You received a partner invitation, please check it on our web: "
+    Topic_ARN = f'{os.environ.get("Topic_ARN")}{id}'
+    created = False;
+    for each in SNS.list_topics(SNS.sns_client, SNS.logger)['Topics']:
+        if (Topic_ARN == each['TopicArn']):
+            created = True
+
+    if created == False:
+        topic_mame = SNS.create_topic(SNS.sns_client, SNS.logger, str(id))
+        response_2 = SNS.subscribe(SNS.sns_client, SNS.logger, Topic_ARN, "email", email)
+
+    else:
+        print(1)
+
+## 飞雷神
+
     return response
 
 @app.route("/api/setcookie", methods=["GET"])
