@@ -123,3 +123,23 @@ WHERE email = 'zheyan.liu@columbia.edu';
 SELECT * FROM ms2_db.users;
 
 
+SELECT t1.*, (CASE WHEN t2.sessionid IS NULL THEN 0 ELSE 1 END) is_registered
+                 FROM
+                 (
+                 SELECT s.sessionid, begintime, endtime, s.notes, s.capacity, count(1) enrolled
+                 FROM ms2_db.sessions s
+                 LEFT JOIN ms2_db.waitlist w
+                 ON s.sessionid = w.sessionid
+                 WHERE s.endtime > 1
+                 GROUP BY s.sessionid, begintime, endtime, s.notes, s.capacity) t1
+                 LEFT JOIN
+                 (
+                 SELECT distinct s.sessionid
+                 FROM ms2_db.sessions s
+                 LEFT JOIN ms2_db.waitlist w
+                 ON s.sessionid = w.sessionid
+                 WHERE w.userid = 1 OR w.partnerid = 1) t2
+                 ON t1.sessionid = t2.sessionid
+;
+
+
