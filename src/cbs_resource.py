@@ -210,7 +210,16 @@ class CBSresource:
     def enroll_session(sessionid, userid, with_partner):
         conn = CBSresource._get_connection()
         cur = conn.cursor()
-
+        # if already approved
+        sql = """SELECT * FROM ms2_db.sessions_enrolled
+                 WHERE sessionid = %s AND userid = %s;
+              """
+        cur.execute(sql, args=(sessionid, userid))
+        res = cur.fetchone()
+        if res:
+            result = {'success': False, 'message': 'Failed. You have already been approved to this session'}
+            return result
+        
         # not with partner
         if with_partner == 0:
             # check if already exist as user or partner
@@ -221,6 +230,7 @@ class CBSresource:
             """
             cur.execute(sql, args=(userid, userid, sessionid))
             res = cur.fetchone()
+
             # if already exist
             if res:
                 result = {'success': False, 'message': 'Failed. You have already joined this waitlist'}
@@ -287,7 +297,40 @@ class CBSresource:
             if res:
                 result = {'success': True, 'message': 'Here is your sessions in the waitlist', 'data': res}
             else:
-                result = {'success': False, 'message': 'You have no sessions in the waitlist', 'data': res}
+                result = {'success': True, 'message': 'You have no sessions in the waitlist', 'data': res}
+
+        except pymysql.Error as e:
+            print(e)
+            res = 'ERROR'
+            result = {'success': False, 'message': str(e)}
+        return result
+
+    @staticmethod
+    def get_approved_session_by_user(userid):
+        sql = """
+        SELECT t1.sessionid, t1.begintime, t1.endtime, t1.capacity, t3.approved_cnt, t1.notes 
+        FROM ms2_db.sessions t1
+        INNER JOIN ms2_db.sessions_enrolled t2
+        ON t1.sessionid = t2.sessionid
+        INNER JOIN (
+            SELECT sessionid, count(*) approved_cnt
+            FROM ms2_db.sessions_enrolled
+            GROUP BY sessionid
+        ) t3
+        ON t1.sessionid = t3.sessionid
+        WHERE t2.userid = %s
+        AND t1.endtime > %s;
+        """
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args=(userid, datetime.now()))
+            res = cur.fetchall()
+            # if fetched successful
+            if res:
+                result = {'success': True, 'message': 'Here is your approved sessions', 'data': res}
+            else:
+                result = {'success': True, 'message': 'You have no approved sessions', 'data': res}
 
         except pymysql.Error as e:
             print(e)
@@ -354,6 +397,12 @@ class CBSresource:
                 for userid in approved_users:
                     sql = "INSERT INTO ms2_db.sessions_enrolled (sessionid, userid) VALUES (%s, %s)"
                     cur.execute(sql, args=(sessionid, userid))
+                    sql = """
+                    DELETE FROM ms2_db.waitlist
+                    WHERE userid = %s
+                    AND sessionid = %s;
+                    """
+                    cur.execute(sql, args=(userid, sessionid))
                 result = {'success': True, 'message': f'Following users joined the session: {approved_users}'}
             except pymysql.Error as e:
                 print(e)

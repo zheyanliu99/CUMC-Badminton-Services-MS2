@@ -119,7 +119,7 @@ SELECT * FROM login_log;
 # create an admin zheyan.liu@columbia.edu
 UPDATE ms2_db.users
 SET role = 'Admin'
-WHERE email = 'zheyan.liu@columbia.edu'
+WHERE email = 'zheyan.liu@columbia.edu';
 SELECT * FROM ms2_db.users;
 
 

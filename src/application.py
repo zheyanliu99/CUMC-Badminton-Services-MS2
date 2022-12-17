@@ -252,6 +252,16 @@ def get_session_by_user(userid):
         rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
     return rsp
 
+@app.route("/api/session/approved/user/<userid>", methods=["GET"])
+def get_approved_session_by_user(userid):
+
+    result = CBSresource.get_approved_session_by_user(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result, cls=DTEncoder), status=200, content_type="application.json")
+    return rsp
+
 @app.route("/api/session/<sessionid>/enroll/<userid>", methods=["POST"])
 def enroll_session(sessionid, userid):
     print(request.data)
