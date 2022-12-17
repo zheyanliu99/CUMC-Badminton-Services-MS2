@@ -325,6 +325,15 @@ def show2(userid):
         rsp = Response(json.dumps(result), status=404, content_type="application.json")
     return rsp
 
+@app.route("/api/userprofile3/<userid>", methods=["GET"])
+def show3(userid):
+    result = CBSresource.show_profile3(userid)
+    if result['success']:
+        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+    else:
+        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+    return rsp
+
 @app.route("/api/userprofile/edit/<userid>", methods=["POST"])
 def edit(userid):
     ## where post id is important

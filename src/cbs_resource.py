@@ -454,9 +454,26 @@ class CBSresource:
         return result
 
     def show_profile2(userid):
-        sql = "Select userid, email, username, sex, preference, credits, \
+        sql = "Select userid, profile_pic, role, email, username, sex, preference, credits, \
                year(birthday) as year, month(birthday) as month, day(birthday) as day \
                FROM ms2_db.users WHERE userid = %s ;"
+        conn = CBSresource._get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, args=userid)
+            # if register success
+            res = cur.fetchall()
+            if res:
+                result = {'success': True, 'data': res}
+            else:
+                result = {'success': False, 'message': 'User_id Not Found', 'data': res}
+        except pymysql.Error as e:
+            print(e)
+            result = {'success': False, 'message': str(e)}
+        return result
+
+    def show_profile3(userid):
+        sql = "Select userid, profile_pic, role, email, username, sex, preference, credits, birthday FROM ms2_db.users WHERE userid = %s ;"
         conn = CBSresource._get_connection()
         cur = conn.cursor()
         try:
