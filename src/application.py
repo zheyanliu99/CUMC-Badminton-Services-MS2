@@ -329,9 +329,9 @@ def show2(userid):
 def show3(userid):
     result = CBSresource.show_profile3(userid)
     if result['success']:
-        rsp = Response(json.dumps(result), status=200, content_type="application.json")
+        rsp = Response(json.dumps(result, cls=DTEncoder, default=str), status=200, content_type="application.json")
     else:
-        rsp = Response(json.dumps(result), status=404, content_type="application.json")
+        rsp = Response(json.dumps(result, cls=DTEncoder, default=str), status=404, content_type="application.json")
     return rsp
 
 @app.route("/api/userprofile/edit/<userid>", methods=["POST"])
