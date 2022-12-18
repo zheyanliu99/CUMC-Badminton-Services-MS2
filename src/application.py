@@ -341,7 +341,7 @@ def edit(userid):
         result = CBSresource.edit_profile(request.get_json()['username'], request.get_json()['sex'],
                                           request.get_json()['birthday'],
                                           request.get_json()['preference'],
-                                          request.get_json()['email'],
+                                          #  request.get_json()['email'],
                                           #  request.get_json()['credits'],
                                           userid)
         rsp = Response(json.dumps(result), status=200, content_type="application.json")

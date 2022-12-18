@@ -490,10 +490,11 @@ class CBSresource:
         return result
 
     @staticmethod
-    def edit_profile(username, sex, birthday, preference, email, userid):
+    def edit_profile(username, sex, birthday, preference, userid):
+        ## , email=%s
         sql_p = "SELECT preference FROM ms2_db.users WHERE userid = %s;"
         sql = "UPDATE ms2_db.users \
-               SET username=%s, sex= %s, birthday=%s, preference=%s, email=%s \
+               SET username=%s, sex= %s, birthday=%s, preference=%s \
                WHERE userid=%s;"
         ##### need to be editted again...
         conn = CBSresource._get_connection()
@@ -502,7 +503,7 @@ class CBSresource:
             cur.execute(sql_p, args=(userid))
             res = cur.fetchone()
             if res:
-                cur.execute(sql, args=(username, sex, birthday, preference, email, userid))
+                cur.execute(sql, args=(username, sex, birthday, preference, userid))
                 # if register success
                 result = {'success': True, 'message': 'You have successfully edited the profile'}
             else:
